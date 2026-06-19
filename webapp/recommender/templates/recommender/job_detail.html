@@ -1,0 +1,90 @@
+{% extends "recommender/base.html" %}
+{% block title %}{% if job %}{{ job.job_title }}{% else %}Detail Lowongan{% endif %}{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <div class="crumb"><a href="{% url 'index' %}" style="color:inherit">Rekomendasi</a> · Detail</div>
+    <h1>Detail Lowongan</h1>
+  </div>
+  <div class="top-actions">
+    <a class="btn-ghost btn-row" href="{% url 'index' %}">&larr; Kembali</a>
+  </div>
+</div>
+
+{% if not ready %}
+  <div class="alert info">Model belum siap. Jalankan <code>python manage.py prepare_artifacts</code>.</div>
+{% elif not job %}
+  <div class="alert err">Lowongan tidak ditemukan.</div>
+{% else %}
+
+<div class="card">
+  <div style="display:flex; gap:16px; align-items:flex-start">
+    <span class="avatar" style="width:54px; height:54px; border-radius:14px; font-size:22px">
+      <i class="ph ph-briefcase"></i>
+    </span>
+    <div style="flex:1; min-width:0">
+      <h1 style="font-size:22px">{{ job.job_title }}</h1>
+      <div class="jc-meta" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
+        <span class="tag">{{ job.category }}</span>
+        <span class="chip"><i class="ph ph-map-pin"></i> {{ job.location }}</span>
+        {% if job.company_industry != "-" %}<span class="chip"><i class="ph ph-buildings"></i> {{ job.company_industry }}</span>{% endif %}
+        {% if job.employment_type != "-" %}<span class="chip"><i class="ph ph-clock"></i> {{ job.employment_type }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2" style="align-items:start">
+  <div class="card">
+    <h2>Informasi Lowongan</h2>
+    <table style="margin-top:6px">
+      <tbody>
+        <tr><td class="muted">Gaji</td><td style="text-align:right; font-weight:600">{{ job.salary }}</td></tr>
+        <tr><td class="muted">Jenjang karier</td><td style="text-align:right">{{ job.career_level }}</td></tr>
+        <tr><td class="muted">Pengalaman</td><td style="text-align:right">{{ job.experience_level }}</td></tr>
+        <tr><td class="muted">Pendidikan</td><td style="text-align:right">{{ job.education_level }}</td></tr>
+        <tr><td class="muted">Fungsi kerja</td><td style="text-align:right">{{ job.job_function }}</td></tr>
+        <tr><td class="muted">Industri</td><td style="text-align:right">{{ job.company_industry }}</td></tr>
+        <tr><td class="muted">Ukuran perusahaan</td><td style="text-align:right">{{ job.company_size }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Skills yang dibutuhkan</h2>
+    {% if job.skills %}
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px">
+        {% for s in job.skills %}<span class="chip">{{ s }}</span>{% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Tidak disebutkan.</p>
+    {% endif %}
+
+    {% if job.benefits %}
+      <h2 style="margin-top:20px">Benefit</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px">
+        {% for b in job.benefits %}<span class="chip"><i class="ph ph-gift"></i> {{ b }}</span>{% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h2>Deskripsi Pekerjaan</h2>
+  {% if job.description and job.description != "-" %}
+    <p style="margin-top:8px; color:var(--text); white-space:pre-line; line-height:1.7">{{ job.description }}</p>
+  {% else %}
+    <p class="muted">Deskripsi tidak tersedia.</p>
+  {% endif %}
+</div>
+
+<div style="display:flex; gap:10px">
+  <a class="btn" href="{% url 'index' %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    Cari Lowongan Lain
+  </a>
+</div>
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Masuk{% endblock %} · JobMatch</title>
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('jm-theme') || 'dark');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="{% static 'recommender/app.css' %}">
+</head>
+<body>
+<div class="auth-wrap">
+  <button class="theme-toggle auth-toggle" type="button" aria-label="Ganti tema"><i class="ph ph-sun"></i></button>
+  <div class="auth-card">
+    <a href="{% url 'login' %}" class="logo">
+      <span class="mark"><i class="ph-fill ph-briefcase"></i></span>
+      JobMatch
+    </a>
+    {% block auth %}{% endblock %}
+  </div>
+</div>
+<script src="{% static 'recommender/app.js' %}"></script>
+</body>
+</html>

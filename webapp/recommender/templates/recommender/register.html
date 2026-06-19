@@ -1,0 +1,42 @@
+{% extends "recommender/auth_base.html" %}
+{% block title %}Daftar{% endblock %}
+{% block auth %}
+  <h1>Buat akun baru</h1>
+  <p class="sub">Daftar untuk menyimpan profil & rekomendasi Anda.</p>
+
+  {% if form.errors %}
+    <div class="form-errors">
+      <ul>
+        {% for field in form %}{% for e in field.errors %}<li>{{ field.label }}: {{ e }}</li>{% endfor %}{% endfor %}
+        {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'register' %}">
+    {% csrf_token %}
+    <div class="field">
+      <label class="lbl">Nama lengkap</label>
+      {{ form.full_name }}
+    </div>
+    <div class="field">
+      <label class="lbl">Username</label>
+      {{ form.username }}
+    </div>
+    <div class="field">
+      <label class="lbl">Email <span class="muted">(opsional)</span></label>
+      {{ form.email }}
+    </div>
+    <div class="field">
+      <label class="lbl">Kata sandi</label>
+      {{ form.password1 }}
+    </div>
+    <div class="field">
+      <label class="lbl">Ulangi kata sandi</label>
+      {{ form.password2 }}
+    </div>
+    <button class="btn btn-block" type="submit">Daftar</button>
+  </form>
+
+  <div class="auth-foot">Sudah punya akun? <a href="{% url 'login' %}">Masuk</a></div>
+{% endblock %}

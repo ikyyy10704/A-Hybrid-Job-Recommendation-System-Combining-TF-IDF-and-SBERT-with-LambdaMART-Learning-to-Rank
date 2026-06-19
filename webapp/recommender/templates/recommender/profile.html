@@ -1,0 +1,61 @@
+{% extends "recommender/base.html" %}
+{% block title %}Profil Saya{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <div class="crumb">Akun · Profil</div>
+    <h1>Profil Saya</h1>
+  </div>
+  <div class="top-actions">
+    <a class="btn" href="{% url 'index' %}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Cari Rekomendasi
+    </a>
+  </div>
+</div>
+
+<div class="card" style="display:flex; align-items:center; gap:16px">
+  <div class="avatar" style="width:54px; height:54px; font-size:20px">{{ prof.initial }}</div>
+  <div>
+    <h2 style="font-size:18px">{{ prof.full_name|default:user.username }}</h2>
+    <p class="muted" style="margin:2px 0 0">@{{ user.username }}{% if user.email %} · {{ user.email }}{% endif %}</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Data Pencari Kerja</h2>
+  <p class="card-sub">Disimpan agar otomatis mengisi form rekomendasi Anda.</p>
+  <form method="post" action="{% url 'profile' %}">
+    {% csrf_token %}
+    <div class="field">
+      <label class="lbl">{{ form.full_name.label }}</label>
+      {{ form.full_name }}
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label class="lbl">{{ form.job_title.label }}</label>
+        {{ form.job_title }}
+      </div>
+      <div class="field">
+        <label class="lbl">{{ form.location.label }}</label>
+        {{ form.location }}
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">{{ form.skills.label }}</label>
+      {{ form.skills }}
+    </div>
+    <div class="field">
+      <label class="lbl">{{ form.experience.label }}</label>
+      {{ form.experience }}
+    </div>
+    <div class="field" style="max-width:50%">
+      <label class="lbl">{{ form.education.label }}</label>
+      {{ form.education }}
+    </div>
+    <button class="btn" type="submit">Simpan Profil</button>
+  </form>
+</div>
+
+{% endblock %}

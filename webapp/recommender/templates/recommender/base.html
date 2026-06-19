@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Rekomendasi Lowongan{% endblock %} · JobMatch</title>
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('jm-theme') || 'dark');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="{% static 'recommender/app.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="top-banner">
+    <i class="ph ph-sparkle"></i> Sistem Rekomendasi Lowongan — Hybrid TF-IDF–SBERT + LambdaMART
+    <a href="{% url 'dashboard' %}">Lihat performa &rarr;</a>
+  </div>
+
+  <nav class="navbar">
+    <a href="{% url 'index' %}" class="logo">
+      <span class="mark"><i class="ph-fill ph-briefcase"></i></span>
+      JobMatch
+    </a>
+
+    <div class="nav-links">
+      <div class="nav-item-wrapper">
+        <a href="{% url 'index' %}" class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">Beranda</a>
+      </div>
+      <div class="nav-item-wrapper">
+        <a href="{% url 'search' %}" class="nav-item {% if request.resolver_match.url_name == 'search' %}active{% endif %}">Pencarian</a>
+      </div>
+      <div class="nav-item-wrapper">
+        <a href="{% url 'job_map' %}" class="nav-item {% if request.resolver_match.url_name == 'job_map' %}active{% endif %}">Peta</a>
+      </div>
+
+      <div class="nav-item-wrapper">
+        <span class="nav-item">Fitur <i class="ph ph-caret-down caret"></i></span>
+        <div class="mega-menu-wrapper">
+          <div class="mega-menu">
+            <div class="mega-col">
+              <h2 class="sol-title">Fitur</h2>
+              <p class="sol-desc">Sistem rekomendasi lowongan berbasis konten: menggabungkan TF-IDF & SBERT, lalu merangking dengan Learning-to-Rank.</p>
+              <a href="{% url 'index' %}" class="featured-card">
+                <div class="fc-header"><i class="ph ph-magnifying-glass"></i> Mulai Pencarian</div>
+                <p class="fc-desc">Cocokkan profilmu dengan 28.858 lowongan dan dapatkan yang paling relevan.</p>
+                <div class="fc-link">Cari sekarang <i class="ph ph-arrow-right"></i></div>
+              </a>
+            </div>
+
+            <div class="mega-col">
+              <div class="col-header">HALAMAN</div>
+              <div class="menu-list">
+                <a href="{% url 'index' %}" class="menu-item">
+                  <div class="icon-box"><i class="ph ph-magnifying-glass"></i></div>
+                  <div class="item-content"><div class="item-title">Rekomendasi Lowongan</div><div class="item-desc">Otomatis dari profil Anda</div></div>
+                </a>
+                <a href="{% url 'search' %}" class="menu-item">
+                  <div class="icon-box"><i class="ph ph-magnifying-glass-plus"></i></div>
+                  <div class="item-content"><div class="item-title">Pencarian Lowongan</div><div class="item-desc">Cari tanpa pakai profil</div></div>
+                </a>
+                <a href="{% url 'job_map' %}" class="menu-item">
+                  <div class="icon-box"><i class="ph ph-map-trifold"></i></div>
+                  <div class="item-content"><div class="item-title">Peta Sebaran</div><div class="item-desc">Sebaran lowongan se-Indonesia</div></div>
+                </a>
+                <a href="{% url 'dashboard' %}" class="menu-item">
+                  <div class="icon-box"><i class="ph ph-chart-bar"></i></div>
+                  <div class="item-content"><div class="item-title">Dashboard Evaluasi</div><div class="item-desc">Metrik NDCG, Precision, MAP</div></div>
+                </a>
+                <a href="{% url 'profile' %}" class="menu-item">
+                  <div class="icon-box"><i class="ph ph-user"></i></div>
+                  <div class="item-content"><div class="item-title">Profil Saya</div><div class="item-desc">Simpan data pencari kerja</div></div>
+                </a>
+                <a href="{% url 'api_recommend' %}" class="menu-item">
+                  <div class="icon-box"><i class="ph ph-code"></i></div>
+                  <div class="item-content"><div class="item-title">API JSON</div><div class="item-desc">Integrasi via REST</div></div>
+                </a>
+              </div>
+            </div>
+
+            <div class="mega-col">
+              <div class="col-header">METODE</div>
+              <div class="menu-list">
+                <a href="{% url 'dashboard' %}" class="simple-item"><i class="ph ph-text-aa"></i> TF-IDF per-field</a>
+                <a href="{% url 'dashboard' %}" class="simple-item"><i class="ph ph-brain"></i> SBERT (768-dim)</a>
+                <a href="{% url 'dashboard' %}" class="simple-item"><i class="ph ph-ranking"></i> LambdaMART</a>
+                <a href="{% url 'dashboard' %}" class="simple-item"><i class="ph ph-target"></i> Relevansi Holistik</a>
+                <a href="{% url 'dashboard' %}" class="simple-item"><i class="ph ph-git-merge"></i> Hybrid Fusion</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-item-wrapper">
+        <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Evaluasi</a>
+      </div>
+      <div class="nav-item-wrapper">
+        <a href="{% url 'profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profil</a>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="theme-toggle" type="button" aria-label="Ganti tema"><i class="ph ph-sun"></i></button>
+      <a class="user-mini" href="{% url 'profile' %}">
+        <span class="avatar">{{ user.profile.initial|default:user.username|slice:":1"|upper }}</span>
+        <span class="u-name">{{ user.profile.full_name|default:user.username }}</span>
+      </a>
+      <form method="post" action="{% url 'logout' %}" style="display:flex">
+        {% csrf_token %}
+        <button class="talk-btn" type="submit">Keluar</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="page">
+    <div class="container">
+      {% if messages %}
+        {% for m in messages %}
+          <div class="alert {% if m.tags == 'error' %}err{% elif m.tags == 'success' %}ok{% else %}info{% endif %}">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script src="{% static 'recommender/app.js' %}"></script>
+</body>
+</html>

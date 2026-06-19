@@ -1,0 +1,99 @@
+{% extends "recommender/base.html" %}
+{% block title %}Pencarian{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <div class="crumb">Pencarian · Ad-hoc</div>
+    <h1>Pencarian Lowongan</h1>
+  </div>
+  <div class="top-actions">
+    <a class="btn-ghost btn-row" href="{% url 'job_map' %}"><i class="ph ph-map-trifold"></i> Peta Sebaran</a>
+  </div>
+</div>
+
+{% if not ready %}
+  <div class="alert info">
+    <strong>Model belum siap.</strong> Jalankan <code>python manage.py prepare_artifacts</code>.
+  </div>
+{% else %}
+
+<div class="card">
+  <h2>Cari Lowongan</h2>
+  <p class="card-sub">Pencarian langsung dari kata kunci — <strong>tidak</strong> memakai data profil Anda.</p>
+  <form method="post" action="{% url 'search' %}">
+    {% csrf_token %}
+    <div class="grid-2">
+      <div class="field">
+        <label class="lbl">Posisi yang dicari</label>
+        <input class="input" type="text" name="job_title" placeholder="cth: Backend Developer, Akuntan" value="{{ q.job_title|default:'' }}">
+      </div>
+      <div class="field">
+        <label class="lbl">Lokasi <span class="muted">(opsional)</span></label>
+        <input class="input" type="text" name="location" placeholder="cth: Surabaya, Bandung" value="{{ q.location|default:'' }}">
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Skills / Kemampuan <span class="muted">(pisahkan dengan koma)</span></label>
+      <input class="input" type="text" name="skills" placeholder="cth: Java, Spring, REST API" value="{{ q.skills|default:'' }}">
+    </div>
+    <div class="field">
+      <label class="lbl">Pengalaman / Deskripsi <span class="muted">(opsional)</span></label>
+      <input class="input" type="text" name="experience" placeholder="cth: 3 tahun backend e-commerce" value="{{ q.experience|default:'' }}">
+    </div>
+    <div class="field">
+      <label class="lbl">Pendidikan <span class="muted">(opsional)</span></label>
+      <input class="input" type="text" name="education" placeholder="cth: S1, D3, SMA" value="{{ q.education|default:'' }}">
+    </div>
+    <button class="btn" type="submit">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Cari Sekarang
+    </button>
+  </form>
+</div>
+
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+
+{% if results %}
+<div class="card">
+  <div class="section-head">
+    <div>
+      <h2>{{ results|length }} Hasil Pencarian</h2>
+      <p class="card-sub" style="margin:2px 0 0">Kata kunci: <strong>{{ q.job_title|default:q.skills }}</strong>{% if q.location %} · {{ q.location }}{% endif %}</p>
+    </div>
+    <span class="tag">LambdaMART</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Judul Lowongan</th><th>Lokasi</th><th>Kategori</th><th>Skor LTR</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr {% if forloop.counter > initial_shown %}class="more-row"{% endif %}>
+          <td class="rank">{{ r.rank }}</td>
+          <td>
+            <a class="j-title" href="{% url 'job_detail' r.idx %}" style="color:inherit">{{ r.job_title }}</a>
+            <div class="j-sub">{{ r.skills }}</div>
+          </td>
+          <td>{{ r.location }}</td>
+          <td><span class="tag">{{ r.category }}</span></td>
+          <td class="pill-num">{{ r.skor_ltr }}</td>
+          <td><a class="btn-ghost btn-row" href="{% url 'job_detail' r.idx %}">Detail</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if results|length > initial_shown %}
+  <div style="text-align:center; margin-top:18px">
+    <button id="load-more" class="btn-ghost btn-row" type="button"
+            data-step="{{ initial_shown }}">Tampilkan lainnya (<span class="rem">{{ remaining }}</span> lagi)</button>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

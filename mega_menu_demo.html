@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Menu Demo</title>
+    <!-- Menggunakan font Inter yang profesional dan enak dibaca -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Menggunakan Phosphor Icons untuk icon yang minimalis -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-color: #0b0a10;
+            --nav-bg: #15141b;
+            --text-main: #f3f3f3;
+            --text-muted: #8e8d98;
+            --accent-color: #7b61ff;
+            --border-color: #2a2933;
+            --hover-bg: #1f1e26;
+            --mega-menu-bg: #15141b;
+            --card-bg: #1e1c27;
+            --glass-bg: rgba(25, 24, 33, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --gradient-start: #ffffff;
+            --gradient-end: #a8a8a8;
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+            --btn-hover-bg: #f0f0f0;
+        }
+
+        :root[data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --nav-bg: #ffffff;
+            --text-main: #111115;
+            --text-muted: #6b6a75;
+            --accent-color: #6246ea;
+            --border-color: #e5e5eb;
+            --hover-bg: #f0f0f5;
+            --mega-menu-bg: #ffffff;
+            --card-bg: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --gradient-start: #111115;
+            --gradient-end: #6b6a75;
+            --btn-bg: #111115;
+            --btn-text: #ffffff;
+            --btn-hover-bg: #2b2b36;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* Top Banner */
+        .top-banner {
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-banner a {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .top-banner a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 48px;
+            position: relative;
+            z-index: 50;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 20px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 40px;
+            padding: 6px 8px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item-wrapper {
+            position: relative;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background-color: var(--hover-bg);
+        }
+
+        .nav-item.active {
+            background-color: var(--hover-bg);
+            color: var(--text-main);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .login-btn {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .login-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s, transform 0.3s;
+        }
+        .theme-toggle:hover {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .talk-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .talk-btn:hover {
+            transform: scale(1.03);
+            background-color: var(--btn-hover-bg);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mega Menu Animation & Wrapper */
+        .mega-menu-wrapper {
+            position: absolute;
+            top: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        visibility 0.4s;
+            width: 950px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* Invisible bridge so menu doesn't close when moving cursor down */
+        .mega-menu-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+        }
+
+        .nav-item-wrapper:hover .mega-menu-wrapper {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* The Mega Menu Card */
+        .mega-menu {
+            background-color: var(--mega-menu-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1.2fr 1.5fr 1fr;
+            gap: 32px;
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glow effect in the bottom left */
+        .mega-menu::before {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(123, 97, 255, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .mega-col {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Vertical Dividers */
+        .mega-col:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -16px;
+            width: 1px;
+            height: 100%;
+            background-color: var(--border-color);
+        }
+
+        .col-header {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        /* Column 1: Solutions */
+        .sol-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        .sol-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .featured-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .featured-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            background-color: #23212f;
+        }
+
+        .fc-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+            font-weight: 500;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .fc-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .fc-link {
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.3s, color 0.3s;
+        }
+
+        .featured-card:hover .fc-link {
+            gap: 10px;
+            color: var(--accent-color);
+        }
+
+        /* Column 2 & 3: Menu Lists */
+        .menu-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 10px;
+            border-radius: 12px;
+            transition: background-color 0.2s, transform 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background-color: var(--hover-bg);
+            transform: translateX(4px);
+        }
+
+        .icon-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 20px;
+            flex-shrink: 0;
+            transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+        }
+
+        .menu-item:hover .icon-box {
+            color: var(--text-main);
+            border-color: #4a4859;
+            background-color: #2a2835;
+        }
+
+        .item-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-title {
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .item-desc {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Simple links for column 3 */
+        .simple-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s, transform 0.2s;
+        }
+
+        .simple-item:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-main);
+            transform: translateX(4px);
+        }
+
+        .simple-item i {
+            color: var(--text-muted);
+            font-size: 18px;
+            transition: color 0.2s;
+        }
+
+        .simple-item:hover i {
+            color: var(--text-main);
+        }
+
+        /* Hero Content for context */
+        .main-content {
+            text-align: center;
+            padding: 120px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content h1 {
+            font-size: 56px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-content p {
+            color: #b0b0b0;
+            font-size: 22px;
+        }
+
+        /* Purple glowing background in the main section */
+        .ambient-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60vh;
+            background: radial-gradient(circle at 50% 100%, rgba(85, 30, 200, 0.4), transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-banner">
+        <i class="ph ph-sparkle"></i> Introducing Evervault's New Payments Security Platform <a href="#">Read More &rarr;</a>
+    </div>
+
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <i class="ph-fill ph-layers"></i>
+            evervault
+        </a>
+
+        <div class="nav-links">
+            <div class="nav-item-wrapper"><a href="#" class="nav-item">Home</a></div>
+            
+            <div class="nav-item-wrapper">
+                <a href="#" class="nav-item active">Solutions</a>
+                
+                <div class="mega-menu-wrapper">
+                    <div class="mega-menu">
+                        <!-- Column 1 -->
+                        <div class="mega-col">
+                            <h2 class="sol-title">Solutions</h2>
+                            <p class="sol-desc">Customizable security and compliance solutions, robust enough to handle any use case.</p>
+                            
+                            <a href="#" class="featured-card">
+                                <div class="fc-header">
+                                    <i class="ph ph-hexagon"></i>
+                                    Evervault Encryption
+                                </div>
+                                <p class="fc-desc">Flexible enough to secure any type of data in any workflow.</p>
+                                <div class="fc-link">Learn more <i class="ph ph-arrow-right"></i></div>
+                            </a>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="mega-col">
+                            <div class="col-header">PAYMENTS</div>
+                            <div class="menu-list">
+                                <a href="#" class="menu-item">
+                                    <div class="icon-box"><i class="ph ph-shield-check"></i></div>
+                                    <div class="item-content">
+                                        <div class="item-title">PCI Compliance</div>
+                                        <div class="item-desc">Become PCI compliant</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <div class="icon-box"><i class="ph ph-git-branch"></i></div>
+                                    <div class="item-content">
+                                        <div class="item-title">Payments Optimization</div>
+                                        <div class="item-desc">Control your payment data</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <div class="icon-box"><i class="ph ph-credit-card"></i></div>
+                                    <div class="item-content">
+                                        <div class="item-title">Card Issuing</div>
+                                        <div class="item-desc">Provision and manage cards</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <div class="icon-box"><i class="ph ph-globe-hemisphere-west"></i></div>
+                                    <div class="item-content">
+                                        <div class="item-title">Network Tokens</div>
+                                        <div class="item-desc">Modernize your payments</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <div class="icon-box"><i class="ph ph-scan"></i></div>
+                                    <div class="item-content">
+                                        <div class="item-title">Card Insights</div>
+                                        <div class="item-desc">Understand your cardholders</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <div class="icon-box"><i class="ph ph-key"></i></div>
+                                    <div class="item-content">
+                                        <div class="item-title">Key Management</div>
+                                        <div class="item-desc">Secure key recovery flows</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Column 3 -->
+                        <div class="mega-col">
+                            <div class="col-header">BY DATA TYPE</div>
+                            <div class="menu-list">
+                                <a href="#" class="simple-item">
+                                    <i class="ph ph-credit-card"></i> Card Data
+                                </a>
+                                <a href="#" class="simple-item">
+                                    <i class="ph ph-bank"></i> Banking Data
+                                </a>
+                                <a href="#" class="simple-item">
+                                    <i class="ph ph-fingerprint"></i> PII
+                                </a>
+                                <a href="#" class="simple-item">
+                                    <i class="ph ph-activity"></i> HIPAA & ePHI
+                                </a>
+                                <a href="#" class="simple-item">
+                                    <i class="ph ph-key"></i> API Credentials
+                                </a>
+                                <a href="#" class="simple-item">
+                                    <i class="ph ph-file-lock"></i> File Encryption
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-item-wrapper"><a href="#" class="nav-item">Customers</a></div>
+            <div class="nav-item-wrapper"><a href="#" class="nav-item">Developers</a></div>
+            <div class="nav-item-wrapper"><a href="#" class="nav-item">Pricing</a></div>
+            <div class="nav-item-wrapper"><a href="#" class="nav-item">Blog</a></div>
+        </div>
+
+        <div class="nav-right">
+            <button class="theme-toggle" id="theme-btn" aria-label="Toggle Dark/Light Mode">
+                <i class="ph ph-sun"></i>
+            </button>
+            <a href="#" class="login-btn">Log in</a>
+            <a href="#" class="talk-btn">Talk to an Expert</a>
+        </div>
+    </nav>
+
+    <div class="ambient-bg"></div>
+
+    <div class="main-content">
+        <h1>Flexible Payment Security</h1>
+        <p>Maximum protection, minimum compliance burden</p>
+    </div>
+
+    <script>
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = themeBtn.querySelector('i');
+        
+        // Default theme check
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateIcon(currentTheme);
+
+        themeBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'light') {
+                themeIcon.className = 'ph ph-moon';
+            } else {
+                themeIcon.className = 'ph ph-sun';
+            }
+        }
+    </script>
+</body>
+</html>

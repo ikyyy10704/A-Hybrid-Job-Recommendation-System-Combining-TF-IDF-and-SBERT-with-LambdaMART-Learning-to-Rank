@@ -1,0 +1,72 @@
+{% extends "recommender/base.html" %}
+{% block title %}Peta Sebaran{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <div class="crumb">Data · Sebaran</div>
+    <h1>Peta Sebaran Lowongan</h1>
+  </div>
+  <div class="top-actions">
+    <a class="btn-ghost btn-row" href="{% url 'search' %}"><i class="ph ph-magnifying-glass"></i> Pencarian</a>
+  </div>
+</div>
+
+{% if not ready %}
+  <div class="alert info"><strong>Data belum siap.</strong> Jalankan <code>python manage.py prepare_artifacts</code>.</div>
+{% else %}
+
+<div class="metrics">
+  <div class="metric"><div class="num">{{ stats.total }}</div><div class="lbl">Total lowongan</div></div>
+  <div class="metric"><div class="num">{{ stats.n_titik }}</div><div class="lbl">Titik lokasi</div></div>
+  <div class="metric"><div class="num">{{ stats.plotted }}</div><div class="lbl">Terpetakan</div></div>
+  <div class="metric"><div class="num">{{ stats.unplotted }}</div><div class="lbl">Tak terpetakan</div></div>
+</div>
+
+<div class="card">
+  <div class="section-head">
+    <h2>Sebaran Lowongan di Indonesia</h2>
+    <span class="tag">Ukuran titik = jumlah lowongan</span>
+  </div>
+  <div id="map" style="height:480px; border-radius:12px; overflow:hidden; border:1px solid var(--line)"></div>
+  <p class="help" style="margin-top:10px">Sumber peta: OpenStreetMap / CARTO. Lokasi tanpa koordinat dikenal ({{ stats.unplotted }} lowongan) tidak ditampilkan.</p>
+</div>
+
+<div class="card">
+  <h2>Lokasi Teratas</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Lokasi</th><th>Jumlah Lowongan</th></tr></thead>
+      <tbody>
+        {% for p in top %}
+        <tr><td class="rank">{{ forloop.counter }}</td><td class="j-title">{{ p.name }}</td><td class="pill-num">{{ p.count }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{ points|json_script:"map-points" }}
+<script>
+(function () {
+  var pts = JSON.parse(document.getElementById("map-points").textContent);
+  var map = L.map("map", { scrollWheelZoom: false }).setView([-2.5, 118], 5);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19, attribution: "&copy; OpenStreetMap, &copy; CARTO"
+  }).addTo(map);
+  var max = pts.reduce(function (m, p) { return Math.max(m, p.count); }, 1);
+  pts.forEach(function (p) {
+    var r = 6 + 34 * Math.sqrt(p.count / max);
+    L.circleMarker([p.lat, p.lng], {
+      radius: r, color: "#3b82f6", weight: 1.5, fillColor: "#3b82f6", fillOpacity: 0.4
+    }).bindPopup("<strong>" + p.name + "</strong><br>" + p.count.toLocaleString("id-ID") + " lowongan").addTo(map);
+  });
+})();
+</script>
+
+{% endif %}
+{% endblock %}

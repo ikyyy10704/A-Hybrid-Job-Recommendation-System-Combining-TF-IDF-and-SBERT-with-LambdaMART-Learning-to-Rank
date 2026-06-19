@@ -1,0 +1,171 @@
+{% extends "recommender/base.html" %}
+{% block title %}Dashboard Evaluasi{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <div class="crumb">Email Marketing · Analytics</div>
+    <h1>Dashboard Evaluasi</h1>
+  </div>
+  <div class="top-actions">
+    <a class="btn btn-ghost" href="{% url 'index' %}">Kembali ke Rekomendasi</a>
+  </div>
+</div>
+
+{% if not ready %}
+  <div class="alert info">
+    <strong>Hasil evaluasi belum tersedia.</strong> Jalankan
+    <code>python manage.py prepare_artifacts</code> terlebih dahulu. Belum ada: {{ missing|join:", " }}.
+  </div>
+{% else %}
+
+<div class="metrics">
+  <div class="metric">
+    <div class="top"><span class="num">{{ m10.ndcg }}%</span><span class="delta up">NDCG@10</span></div>
+    <div class="lbl">Kualitas perangkingan</div>
+  </div>
+  <div class="metric">
+    <div class="top"><span class="num">{{ m10.precision }}%</span><span class="delta up">P@10</span></div>
+    <div class="lbl">Presisi top-10</div>
+  </div>
+  <div class="metric">
+    <div class="top"><span class="num">{{ m10.map }}%</span><span class="delta up">MAP@10</span></div>
+    <div class="lbl">Mean Average Precision</div>
+  </div>
+  <div class="metric">
+    <div class="top"><span class="num">{{ ev.data_size }}</span></div>
+    <div class="lbl">Total lowongan dianalisis</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h2>Ringkasan Eksperimen</h2><span class="tag">SEED 42</span></div>
+  <p class="muted" style="margin:0">
+    Hybrid V = {{ ev.hyperparams.alpha }}·TF-IDF + {{ ev.hyperparams.beta }}·SBERT
+    · Retrieval Top-{{ ev.hyperparams.pool }} (Euclidean)
+    · Bobot TF-IDF judul {{ ev.hyperparams.weights.title }} / skill {{ ev.hyperparams.weights.skills }} / deskripsi {{ ev.hyperparams.weights.desc }}
+    · Dimensi TF-IDF {{ ev.hyperparams.tfidf_dim }} + SBERT {{ ev.hyperparams.sbert_dim }}
+    · Query latih {{ ev.train_size }} / uji {{ ev.test_size }} (dari {{ ev.n_queries }})
+  </p>
+</div>
+
+<div class="card">
+  <div class="section-head"><h2>Karakteristik Data</h2></div>
+  <div class="grid-2">
+    <div>
+      <p class="muted" style="margin:0 0 12px; font-size:13px">Ketersediaan fitur struktural (%)</p>
+      {% for name, val in ev.availability.items %}
+      <div class="bar-row">
+        <div class="bar-top"><span>{{ name }}</span><span class="muted">{{ val }}%</span></div>
+        <div class="bar"><i style="width:{{ val }}%"></i></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div>
+      <p class="muted" style="margin:0 0 12px; font-size:13px">Distribusi kategori judul (top 8)</p>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            {% for name, val in ev.category_counts.items %}
+            <tr><td>{{ name }}</td><td style="text-align:right" class="pill-num">{{ val }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h2>Kinerja Metode Usulan (multi-K)</h2></div>
+  <div class="grid-2" style="align-items:start">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>K</th><th>NDCG</th><th>Precision</th><th>MAP</th></tr></thead>
+        <tbody>
+          {% for k, m in ev.metrics.items %}
+          <tr><td class="rank">{{ k }}</td><td>{{ m.ndcg }}%</td><td>{{ m.precision }}%</td><td>{{ m.map }}%</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <svg viewBox="0 0 {{ chart.w }} {{ chart.h }}" width="100%">
+        {% for t in chart.yticks %}
+          <line x1="{{ chart.pad_l }}" y1="{{ t.y }}" x2="{{ chart.w|add:'-16' }}" y2="{{ t.y }}" stroke="rgba(148,163,184,.25)" stroke-width="1"/>
+          <text x="{{ chart.pad_l|add:'-8' }}" y="{{ t.y|add:'4' }}" fill="#94a3b8" font-size="11" text-anchor="end">{{ t.label }}</text>
+        {% endfor %}
+        {% for t in chart.xticks %}
+          <text x="{{ t.x }}" y="{{ chart.h|add:'-12' }}" fill="#9ca3af" font-size="11" text-anchor="middle">K={{ t.label }}</text>
+        {% endfor %}
+        {% for s in chart.series %}
+          <polyline points="{{ s.polyline }}" fill="none" stroke="{{ s.color }}" stroke-width="2.5"/>
+          {% for p in s.points %}<circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="4" fill="{{ s.color }}"/>{% endfor %}
+        {% endfor %}
+      </svg>
+      <div class="legend">
+        {% for s in chart.series %}<span><span class="dot" style="background:{{ s.color }}"></span>{{ s.name }}</span>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h2>Studi Ablation &amp; Pembanding</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metode</th><th>NDCG@5</th><th>NDCG@10</th><th>NDCG@20</th><th>Precision@10</th><th>MAP@10</th></tr></thead>
+      <tbody>
+        {% for a in ev.ablation %}
+        <tr {% if a.metode == "Hybrid + LambdaMART" %}class="row-hl"{% endif %}>
+          <td class="j-title">{{ a.metode }}</td>
+          <td>{{ a.ndcg5 }}%</td><td>{{ a.ndcg10 }}%</td><td>{{ a.ndcg20 }}%</td>
+          <td>{{ a.prec10 }}%</td><td>{{ a.map10 }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="muted" style="margin:14px 0 6px; font-size:13px">Uji Wilcoxon (NDCG@10) — Hybrid + LambdaMART vs tiap baseline:</p>
+  <ul class="muted" style="margin:0; font-size:13px">
+    {% for w in ev.wilcoxon %}<li>vs <strong>{{ w.baseline }}</strong>: p = {{ w.p }} — {{ w.winner }}</li>{% endfor %}
+  </ul>
+</div>
+
+<div class="card">
+  <div class="section-head"><h2>Feature Importance (LambdaMART)</h2></div>
+  {% for f in ev.feature_importance %}
+  <div class="bar-row">
+    <div class="bar-top"><span>{{ f.feature }}</span><span class="muted">{{ f.importance }}</span></div>
+    <div class="bar"><i style="width:{{ f.pct }}%"></i></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="section-head"><h2>Contoh Masukan &amp; Keluaran</h2></div>
+  <p class="muted" style="font-size:13px">
+    <strong>Input</strong> — {{ ev.example.input.job_title }} · {{ ev.example.input.location }} · {{ ev.example.input.category }}<br>
+    Skill: {{ ev.example.input.skills }}
+  </p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Judul Lowongan</th><th>Lokasi</th><th>Kategori</th><th>Relevansi (0-4)</th><th>Skor LTR</th></tr></thead>
+      <tbody>
+        {% for o in ev.example.output %}
+        <tr>
+          <td class="rank">{{ o.rank }}</td>
+          <td class="j-title">{{ o.job_title }}</td>
+          <td>{{ o.location }}</td>
+          <td><span class="tag">{{ o.category }}</span></td>
+          <td>{{ o.relevansi }}</td>
+          <td class="pill-num">{{ o.skor_ltr }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}

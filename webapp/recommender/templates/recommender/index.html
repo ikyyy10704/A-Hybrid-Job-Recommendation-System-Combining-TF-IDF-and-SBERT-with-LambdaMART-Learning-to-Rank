@@ -1,0 +1,173 @@
+{% extends "recommender/base.html" %}
+{% block title %}Rekomendasi{% endblock %}
+{% block head %}
+  {% if results %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  {% endif %}
+{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <div class="crumb">Beranda · Rekomendasi</div>
+    <h1>Rekomendasi Lowongan</h1>
+  </div>
+  <div class="top-actions">
+    <a class="btn-ghost btn-row" href="{% url 'profile' %}">
+      <i class="ph ph-user"></i> Profil Saya
+    </a>
+    <a class="btn-ghost btn-row" href="{% url 'dashboard' %}">Lihat Evaluasi</a>
+  </div>
+</div>
+
+{% if not ready %}
+  <div class="alert info">
+    <strong>Model belum siap.</strong> Artifact belum ada: {{ missing|join:", " }}.
+    Jalankan sekali di folder <code>webapp/</code>: <code>python manage.py prepare_artifacts</code>.
+  </div>
+
+{% elif not has_profile %}
+  <div class="card" style="text-align:center; padding:52px 24px">
+    <div class="avatar" style="width:64px; height:64px; border-radius:18px; font-size:30px; margin:0 auto 18px">
+      <i class="ph ph-user-circle-plus"></i>
+    </div>
+    <h2 style="font-size:21px">Lengkapi profil Anda</h2>
+    <p class="muted" style="max-width:480px; margin:10px auto 22px">
+      Isi posisi yang dicari, skills, dan pengalaman pada profil untuk mengaktifkan
+      <strong>fitur rekomendasi lowongan</strong>. Begitu profil terisi, rekomendasi
+      akan muncul otomatis di halaman ini.
+    </p>
+    <a class="btn" href="{% url 'profile' %}">
+      <i class="ph ph-pencil-simple-line"></i> Lengkapi Profil
+    </a>
+  </div>
+
+{% else %}
+  {% if results %}
+  <div class="card">
+    <div class="section-head">
+      <div>
+        <h2>Lokasi Rekomendasi</h2>
+        <p class="card-sub" style="margin:2px 0 0">
+          Sebaran lowongan yang direkomendasikan{% if map_data.label != "Indonesia" %} — fokus di <strong>{{ map_data.label }}</strong>{% endif %}.
+        </p>
+      </div>
+      <span class="tag"><i class="ph ph-map-pin"></i> Peta</span>
+    </div>
+    <div id="map" style="height:340px; border-radius:12px; overflow:hidden; border:1px solid var(--line)"></div>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="section-head">
+      <div>
+        <h2>Rekomendasi untuk Anda</h2>
+        <p class="card-sub" style="margin:2px 0 0">
+          Berdasarkan profil: <strong>{{ prof.job_title|default:prof.skills }}</strong>{% if prof.location %} · {{ prof.location }}{% endif %}
+          — <a href="{% url 'profile' %}">ubah kriteria</a>
+        </p>
+      </div>
+      <div class="btn-row" style="gap:10px; padding:0; background:transparent">
+        {% if eval %}
+        <button id="eval-toggle" class="btn-ghost btn-row" type="button"
+                aria-expanded="false" aria-controls="eval-info">
+          <i class="ph ph-seal-check"></i> Akurasi model
+        </button>
+        {% endif %}
+        <span class="tag">LambdaMART</span>
+      </div>
+    </div>
+
+    {% if eval %}
+    <div id="eval-info" hidden style="margin-bottom:18px; padding:16px; border:1px solid var(--line);
+         border-radius:12px; background:var(--hover)">
+      <p class="muted" style="margin:0 0 12px; font-size:13px">
+        <i class="ph ph-info"></i> Seberapa andal peringkat ini? Berikut hasil evaluasi model
+        pada <strong>{{ eval.test_size }}</strong> query uji yang belum pernah dilihat saat pelatihan.
+      </p>
+      <div class="metrics" style="margin-bottom:12px">
+        <div class="metric">
+          <div class="top"><span class="num">{{ eval.ndcg }}%</span><span class="delta up">NDCG@10</span></div>
+          <div class="lbl">Kualitas perangkingan</div>
+        </div>
+        <div class="metric">
+          <div class="top"><span class="num">{{ eval.precision }}%</span><span class="delta up">P@10</span></div>
+          <div class="lbl">Presisi top-10</div>
+        </div>
+        <div class="metric">
+          <div class="top"><span class="num">{{ eval.map }}%</span><span class="delta up">MAP@10</span></div>
+          <div class="lbl">Mean Average Precision</div>
+        </div>
+        <div class="metric">
+          <div class="top"><span class="num">{{ eval.data_size }}</span></div>
+          <div class="lbl">Total lowongan dianalisis</div>
+        </div>
+      </div>
+      <p class="muted" style="margin:0; font-size:13px">
+        {% if eval.gain and eval.best_base %}
+        Metode <strong>Hybrid + LambdaMART</strong> unggul <strong>{{ eval.gain }} poin</strong>
+        NDCG@10 dibanding baseline terbaik ({{ eval.best_base }}).
+        {% endif %}
+        <a href="{% url 'dashboard' %}">Lihat detail evaluasi &rarr;</a>
+      </p>
+    </div>
+    {% endif %}
+
+    {% if results %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Judul Lowongan</th><th>Lokasi</th><th>Kategori</th><th>Skor LTR</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+          <tr {% if forloop.counter > initial_shown %}class="more-row"{% endif %}>
+            <td class="rank">{{ r.rank }}</td>
+            <td>
+              <a class="j-title" href="{% url 'job_detail' r.idx %}" style="color:inherit">{{ r.job_title }}</a>
+              <div class="j-sub">{{ r.skills }}</div>
+            </td>
+            <td>{{ r.location }}</td>
+            <td><span class="tag">{{ r.category }}</span></td>
+            <td class="pill-num">{{ r.skor_ltr }}</td>
+            <td><a class="btn-ghost btn-row" href="{% url 'job_detail' r.idx %}">Detail</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if results|length > initial_shown %}
+    <div style="text-align:center; margin-top:18px">
+      <button id="load-more" class="btn-ghost btn-row" type="button"
+              data-step="{{ initial_shown }}">Tampilkan lainnya (<span class="rem">{{ remaining }}</span> lagi)</button>
+    </div>
+    {% endif %}
+    {% else %}
+      <p class="muted">Belum ada lowongan yang cocok. Coba sesuaikan kriteria di <a href="{% url 'profile' %}">Profil Saya</a>.</p>
+    {% endif %}
+  </div>
+
+  {% if results %}
+  {{ map_data|json_script:"map-data" }}
+  <script>
+  (function () {
+    var el = document.getElementById("map-data");
+    if (!el || typeof L === "undefined") return;
+    var d = JSON.parse(el.textContent);
+    var map = L.map("map", { scrollWheelZoom: false }).setView(d.center, d.zoom);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      { maxZoom: 19, attribution: "&copy; OpenStreetMap, &copy; CARTO" }).addTo(map);
+    var max = (d.points || []).reduce(function (m, p) { return Math.max(m, p.count); }, 1);
+    (d.points || []).forEach(function (p) {
+      var r = 6 + 22 * Math.sqrt(p.count / max);
+      L.circleMarker([p.lat, p.lng], { radius: r, color: "#3b82f6", weight: 1.5, fillColor: "#3b82f6", fillOpacity: 0.4 })
+        .bindPopup("<strong>" + p.name + "</strong><br>" + p.count + " rekomendasi").addTo(map);
+    });
+  })();
+  </script>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

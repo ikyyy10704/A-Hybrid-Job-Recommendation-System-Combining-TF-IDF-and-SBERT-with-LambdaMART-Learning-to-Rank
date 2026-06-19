@@ -1,0 +1,9 @@
+Django>=5.0
+numpy
+pandas
+scipy
+scikit-learn
+lightgbm
+sentence-transformers
+torch
+joblib

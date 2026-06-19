@@ -1,0 +1,34 @@
+[18/Jun/2026 20:21:14] "GET /login/ HTTP/1.1" 200 1971
+[18/Jun/2026 20:21:14] "GET /search/ HTTP/1.1" 302 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+June 18, 2026 - 20:21:09
+Django version 6.0.6, using settings 'config.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/6.0/howto/deployment/
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 3311.05it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 4997.46it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 5614.15it/s]
+[18/Jun/2026 20:25:30] "GET / HTTP/1.1" 200 65579
+[18/Jun/2026 20:25:30,094] - Broken pipe from ('127.0.0.1', 64952)
+[18/Jun/2026 20:25:30,096] - Broken pipe from ('127.0.0.1', 53129)
+[18/Jun/2026 20:45:41] "GET /search/ HTTP/1.1" 200 7902
+[18/Jun/2026 20:45:41] "GET /static/recommender/app.css HTTP/1.1" 304 0
+[18/Jun/2026 20:45:41] "GET /static/recommender/app.js HTTP/1.1" 304 0
+[18/Jun/2026 20:45:44] "GET /map/ HTTP/1.1" 200 14947
+[18/Jun/2026 20:45:47] "GET /dashboard/ HTTP/1.1" 200 19963
+[18/Jun/2026 20:45:48] "GET /profile/ HTTP/1.1" 200 8535
+[18/Jun/2026 20:45:48] "GET /dashboard/ HTTP/1.1" 200 19963
+[18/Jun/2026 20:47:01] "GET /map/ HTTP/1.1" 200 14947
+[18/Jun/2026 20:47:06] "GET /profile/ HTTP/1.1" 200 8535
+[18/Jun/2026 20:47:10] "GET /profile/ HTTP/1.1" 200 8535
+[18/Jun/2026 20:47:12] "GET /profile/ HTTP/1.1" 200 8535
+[18/Jun/2026 20:47:13] "GET /dashboard/ HTTP/1.1" 200 19963
+[18/Jun/2026 20:47:13] "GET /search/ HTTP/1.1" 200 7902
+[18/Jun/2026 20:47:16] "GET /dashboard/ HTTP/1.1" 200 19963
+[18/Jun/2026 20:47:19,809] - Broken pipe from ('127.0.0.1', 57515)
